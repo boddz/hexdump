@@ -1,0 +1,16 @@
+Hexdump
+=======
+
+A simple hex dump program written in C.
+
+
+Setup
+-----
+
+Build:
+
+  $ cd hexdump && make
+
+Usage:
+
+  $ ./hexdump foo.bin  # dump hex of binary
