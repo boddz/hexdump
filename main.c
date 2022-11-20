@@ -54,8 +54,8 @@ int main(int argc, char** argv)
 		    " ",
 		    argv[1],
 		    file_size(file_in),
-		    units_padding + 1, j + 1); // 1st line of file
-      else printf("\n%*li | ", units_padding + 1, j + 1); // proceeding lines
+		    units_padding + 1, j + 1); // 1st row (16 char hex per row)
+      else printf("\n%*li | ", units_padding + 1, j + 1); // proceeding rows
       j++;
     }
     printf("%#04hhX ", file_array[i]); // pretty hex pad 5 0s
