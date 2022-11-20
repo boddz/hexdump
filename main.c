@@ -37,14 +37,25 @@ int main(int argc, char** argv)
     ++units_padding; // printf padding to correspond to times div/ units in file size
   } // this will repeat until div as much as possible
 
+  // check file actually has contents
+  if(!file_size(file_in)) {
+    fprintf(stderr, "File has no contents\n");
+    return 1;
+  }
+
   // hex dump print and formatting of hex/ lines
   size_t j = 0;
   for(size_t i = 0; i < file_size(file_in); i++) {
     if(i == 16 * j) {
       // ("%*li", x) '*' <- syntax allows var param to set format specifier
       // really cool, in this example dynamically pad for number of units in file size
-      if(!i) printf("%*li | ", units_padding, j + 1); // 1st line of file
-      else printf("\n%*li | ", units_padding, j + 1); // proceeding lines
+      if(!i) printf("%*sRW\tFile: %s\tSize: %lib\n%*li | ",
+		    units_padding - 1,
+		    " ",
+		    argv[1],
+		    file_size(file_in),
+		    units_padding + 1, j + 1); // 1st line of file
+      else printf("\n%*li | ", units_padding + 1, j + 1); // proceeding lines
       j++;
     }
     printf("%#04hhX ", file_array[i]); // pretty hex pad 5 0s
