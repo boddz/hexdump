@@ -1,7 +1,9 @@
 /* Hex Dump
  * --------
  *
- * Simply print a 'pretty' hex dump of a specified file to stdout. */
+ * Simply print a 'pretty' hex dump of a specified file to stdout.
+ *
+ * Yeah this could be prettier but it gets the job done... */
 
 
 #include <stdio.h>
@@ -29,14 +31,6 @@ int main(int argc, char** argv)
   file_in = fopen(argv[1], "rb");
   char* file_array = file_contents(file_in);
 
-  // logic for dynamic padding depending on size of file (no ugly padding in hex dump)
-  size_t fsize = file_size(file_in) / 16;
-  int units_padding = 0;
-  while(fsize) {
-    fsize /= 10; // decrement until 0 to count units (1000, 100, 10, 1)
-    ++units_padding; // printf padding to correspond to times div/ units in file size
-  } // this will repeat until div as much as possible
-
   // check file actually has contents
   if(!file_size(file_in)) {
     fprintf(stderr, "File has no contents\n");
@@ -45,24 +39,36 @@ int main(int argc, char** argv)
 
   // hex dump print and formatting of hex/ lines
   size_t j = 0;
+  size_t k = 0;
+  char readable[17] = {0};
   for(size_t i = 0; i < file_size(file_in); i++) {
     if(i == 16 * j) {
-      // ("%*li", x) '*' <- syntax allows var param to set format specifier
-      // really cool, in this example dynamically pad for number of units in file size
-      if(!i) printf("%*sRW\tFile: %s\tSize: %lib\n%*li | ",
-		    units_padding - 1,
-		    " ",
-		    argv[1],
-		    file_size(file_in),
-		    units_padding + 1, j + 1); // 1st row (16 char hex per row)
-      else printf("\n%*li | ", units_padding + 1, j + 1); // proceeding rows
-      j++;
+      if(!i) { // first row
+	printf("%s", readable);
+	printf("Offset     File: %s     Size: %lib\n%08lx | ",
+	       argv[1],
+	       file_size(file_in), i);
+      }
+      else { // other rows
+	printf("| %s", readable);
+	printf("\n%08lx | ", i);
+      }
+      k = 0; // reset counter for readable char array
+      j++; // row offset multiplier
     }
-    printf("%#04hhX ", file_array[i]); // pretty hex pad 5 0s
-  }
-  printf("\n");
 
-  // clean up
+    // append to readable char array for EOL print if a-z/ A-Z
+    if(file_array[i] > 'A' && file_array[i] < 'Z' ||
+       file_array[i] > 'a' && file_array[i] < 'z')
+      readable[k] = file_array[i];
+    else readable[k] = '.';
+    ++k;
+
+    printf("%02hhX ", file_array[i]); // avoid long 'F' padded hex
+  }
+  // (48 - k * 3) make final row match previous padding
+  printf("%*s| %s\n", 48 - k * 3, "", readable);
+
   fclose(file_in);
   free(file_array);
 
