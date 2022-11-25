@@ -67,7 +67,8 @@ int main(int argc, char** argv)
     printf("%02hhX ", file_array[i]); // avoid long 'F' padded hex
   }
   // (48 - k * 3) make final row match previous padding
-  printf("%*s| %s\n", 48 - k * 3, "", readable);
+  int pad_end_row = 48 - k * 3;
+  printf("%*s| %s\n", pad_end_row, "", readable);
 
   fclose(file_in);
   free(file_array);
